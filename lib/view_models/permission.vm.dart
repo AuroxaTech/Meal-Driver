@@ -114,21 +114,53 @@ class PermissionViewModel extends MyBaseViewModel {
   // }
 
 //PERMISSION HANDLERS
-  handleLocationPermission() async {
-    PermissionStatus status = await Permission.location.request();
-    if (status.isGranted) {
-      nextStep();
-      notifyListeners();
-    } else {
-      toastError("Permission denied".tr());
-    }
 
-    if (status.isPermanentlyDenied) {
+  Future<void> handleLocationPermission(BuildContext context) async {
+    var status = await Permission.location.request();
+    print("Location permission status: $status");
+
+    if (status.isGranted) {
+      print("Permission granted.");
       nextStep();
       notifyListeners();
-      return;
+    } else if (status.isPermanentlyDenied) {
+      print("Permission permanently denied.");
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Location Permission Required"),
+          content: Text(
+              "This app needs location access to function properly. Please enable location permissions in your device settings."),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await openAppSettings();
+              },
+              child: Text("Open Settings"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                toastError("Permission denied");
+                nextStep();
+                notifyListeners();
+              },
+              child: Text("Cancel"),
+            ),
+          ],
+        ),
+      );
+    } else {
+      print("Permission denied.");
+      toastError("Permission denied");
+      nextStep();
+      notifyListeners();
     }
   }
+
+
+
 
   handleBackgroundLocationPermission() async {
     PermissionStatus status = await Permission.locationAlways.request();

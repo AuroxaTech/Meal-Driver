@@ -55,8 +55,11 @@ class _RequestLocationPermissionViewState
         CustomButton(
           shapeRadius: 25,
           title: "Next".tr(),
-          onPressed: widget.vm.handleLocationPermission,
+          onPressed: () async {
+            await widget.vm.handleLocationPermission(context);
+          },
         ),
+
         UiSpacer.vSpace(10),
         Visibility(
           visible: !Platform.isIOS,

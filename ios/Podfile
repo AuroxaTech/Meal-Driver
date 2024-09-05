@@ -31,7 +31,14 @@ target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
+  # Add your other pods like Google Maps/Places here
+  pod 'GoogleMaps'
+  pod 'GooglePlaces'
+
+  # Install all iOS Pods from Flutter and other dependencies
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
+  # Ensure your test targets inherit search paths
   target 'RunnerTests' do
     inherit! :search_paths
   end

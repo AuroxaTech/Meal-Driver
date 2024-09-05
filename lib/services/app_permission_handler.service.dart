@@ -39,7 +39,7 @@ class AppPermissionHandlerService {
 
   Future<bool> handleLocationRequest() async {
     var status = await Permission.locationWhenInUse.status;
-    //check if location permission is not granted
+
     if (!status.isGranted) {
       final requestResult = await showDialog(
         barrierDismissible: false,
@@ -48,78 +48,70 @@ class AppPermissionHandlerService {
           return RegularLocationPermissionDialog();
         },
       );
-      //check if dialog was accepted or not
-      if (requestResult == null || (requestResult is bool && !requestResult)) {
+
+      if (requestResult == null || !(requestResult is bool && requestResult)) {
         return false;
       }
 
-      //
-      PermissionStatus status = await Permission.locationWhenInUse.request();
-      if (status.isGranted) {
-        //
-        final requestResult = await showDialog(
-          barrierDismissible: false,
-          context: AppService().navigatorKey.currentContext!,
-          builder: (context) {
-            return BackgroundLocationPermissionDialog();
-          },
-        );
-        //check if dialog was accepted or not
-        if (requestResult == null ||
-            (requestResult is bool && !requestResult)) {
-          return false;
-        }
-
-        //request for alway in use location
-        status = await Permission.locationAlways.request();
-        if (!status.isGranted) {
-          permissionDeniedAlert();
-        }
-      } else {
-        permissionDeniedAlert();
-      }
-
-      if (status.isPermanentlyDenied) {
-        //When the user previously rejected the permission and select never ask again
-        //Open the screen of settings
-        await openAppSettings();
-      }
-    }
-    //location permission is granted
-    else {
-      //In use is available, check the always in use
-      var status = await Permission.locationAlways.status;
+      status = await Permission.locationWhenInUse.request();
       if (!status.isGranted) {
-        final requestResult = await showDialog(
-          barrierDismissible: false,
-          context: AppService().navigatorKey.currentContext!,
-          builder: (context) {
-            return BackgroundLocationPermissionDialog();
-          },
-        );
-        //check if dialog was accepted or not
-        if (requestResult == null ||
-            (requestResult is bool && !requestResult)) {
-          return false;
+        permissionDeniedAlert();
+        if (status.isPermanentlyDenied) {
+          await openAppSettings();
         }
+        return false;
+      }
 
-        //request for alway in use location
-        var status = await Permission.locationAlways.request();
-        if (status.isGranted) {
-          //Do some stuff
-        } else {
-          var status = await Permission.locationAlways.status;
-          if (!status.isGranted) {
-            permissionDeniedAlert();
-          }
+      final backgroundRequestResult = await showDialog(
+        barrierDismissible: false,
+        context: AppService().navigatorKey.currentContext!,
+        builder: (context) {
+          return BackgroundLocationPermissionDialog();
+        },
+      );
+
+      if (backgroundRequestResult == null || !(backgroundRequestResult is bool && backgroundRequestResult)) {
+        return false;
+      }
+
+      status = await Permission.locationAlways.request();
+      if (!status.isGranted) {
+        permissionDeniedAlert();
+        if (status.isPermanentlyDenied) {
+          await openAppSettings();
         }
-      } else {
-        //previously available, do some stuff or nothing
-        return true;
+        return false;
       }
     }
+
+    // If "WhenInUse" permission is granted, check "Always"
+    status = await Permission.locationAlways.status;
+    if (!status.isGranted) {
+      final backgroundRequestResult = await showDialog(
+        barrierDismissible: false,
+        context: AppService().navigatorKey.currentContext!,
+        builder: (context) {
+          return BackgroundLocationPermissionDialog();
+        },
+      );
+
+      if (backgroundRequestResult == null || !(backgroundRequestResult is bool && backgroundRequestResult)) {
+        return false;
+      }
+
+      status = await Permission.locationAlways.request();
+      if (!status.isGranted) {
+        permissionDeniedAlert();
+        if (status.isPermanentlyDenied) {
+          await openAppSettings();
+        }
+        return false;
+      }
+    }
+
     return true;
   }
+
 
   //
   void permissionDeniedAlert() async {

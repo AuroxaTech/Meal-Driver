@@ -42,6 +42,7 @@ dependencies:
   firestore_chat: ^0.1.2
   dash_chat_2: ^0.0.21
   fl_location: ^3.1.0
+  location: ^7.0.0
   flag: ^7.0.0
   flutter:
     sdk: flutter
@@ -116,8 +117,8 @@ flutter_icons:
   android: "launcher_icon"
   ios: true
   remove_alpha_ios: true
-  image_path: "assets/images/app_icon.png"
-  adaptive_icon_foreground: "assets/images/app_icon.png"
+  image_path: "assets/images/mealknight.jpg"
+  adaptive_icon_foreground: "assets/images/mealknight.jpg"
   adaptive_icon_background: "#5e17eb"
 
 flutter:
