@@ -58,12 +58,16 @@
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Mealknight requires access to your photo library to upload images from your device to enhance your user profile or share within chats.</string>
 
+    <key>NSLocationUsageDescription</key>
+    <string>Older devices need location.</string>
     <!-- Location Usage When In Use Description -->
-        <!-- Location Usage When In Use Description -->
-        <key>NSLocationWhenInUseUsageDescription</key>
-        <string>Mealknight needs access to your location to provide restaurant suggestions and delivery services while you are using the app.</string>
-        <!-- Location Usage Always and When In Use Description -->
-        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-        <string>Mealknight needs access to your location at all times to send you real-time notifications about nearby restaurant deals and order updates, even when the app is in the background.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Mealknight needs your location to provide navigation directions even when the app is running in the background.</string>
+    <!-- Location Usage When In Use Description -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Mealknight needs access to your location to provide restaurant suggestions and delivery services while you are using the app.</string>
+    <!-- Location Usage Always and When In Use Description -->
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Mealknight needs access to your location at all times to send you real-time notifications about nearby restaurant deals and order updates, even when the app is in the background.</string>
 </dict>
 </plist>

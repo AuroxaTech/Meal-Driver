@@ -121,8 +121,7 @@ class PermissionViewModel extends MyBaseViewModel {
 
     if (status.isGranted) {
       print("Permission granted.");
-      nextStep();
-      notifyListeners();
+      nextStep(); // Only move to the next step when permission is granted
     } else if (status.isPermanentlyDenied) {
       print("Permission permanently denied.");
       await showDialog(
@@ -142,9 +141,8 @@ class PermissionViewModel extends MyBaseViewModel {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                toastError("Permission denied");
-                nextStep();
-                notifyListeners();
+                // Show error only when denied permanently
+                toastError("Permission denied permanently");
               },
               child: Text("Cancel"),
             ),
@@ -152,12 +150,15 @@ class PermissionViewModel extends MyBaseViewModel {
         ),
       );
     } else {
+      // Permission denied but not permanently
       print("Permission denied.");
-      toastError("Permission denied");
-      nextStep();
-      notifyListeners();
+      toastError("Permission denied"); // Show error when denied
     }
+
+    // Ensure UI is updated
+    notifyListeners();
   }
+
 
 
 
@@ -168,7 +169,7 @@ class PermissionViewModel extends MyBaseViewModel {
       nextStep();
       notifyListeners();
     } else {
-      toastError("Permission denied".tr());
+      toastError("Background Location Permission denied".tr());
     }
 
     if (status.isPermanentlyDenied) {
