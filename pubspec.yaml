@@ -113,13 +113,19 @@ dev_dependencies:
   flutter_launcher_icons: ^0.13.1
   translator: ^1.0.0
 
-flutter_icons:
+flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   remove_alpha_ios: true
   image_path: "assets/images/mealknight.jpg"
   adaptive_icon_foreground: "assets/images/mealknight.jpg"
-  adaptive_icon_background: "#5e17eb"
+  adaptive_icon_background: "#ffffff"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "assets/images/mealknight.jpg"
+    background_color: "#ffffff"
+    theme_color: "#0000FF"
 
 flutter:
   uses-material-design: true

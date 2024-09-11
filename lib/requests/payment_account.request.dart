@@ -25,14 +25,24 @@ class PaymentAccountRequest extends HttpService {
     );
 
     final apiResponse = ApiResponse.fromResponse(apiResult);
+
     if (apiResponse.allGood) {
-      return (page == 0 ? apiResponse.body["data"] as List : apiResponse.data)
-          .map((e) => PaymentAccount.fromJson(e))
-          .toList();
+      var data = apiResponse.body["data"];
+
+      // Since the data is a single object, we wrap it in a list
+      if (data is Map) {
+        return [PaymentAccount.fromJson(data.cast<String, dynamic>())];
+      } else if (data is List) {
+        // If by any chance the data is a list in other cases, handle it
+        return data.map((e) => PaymentAccount.fromJson(e)).toList();
+      } else {
+        throw "Unexpected data format: ${data.runtimeType}";
+      }
     }
 
     throw "${apiResponse.message}";
   }
+
 
   //
   Future<ApiResponse> requestPayout(Map<String, dynamic> payload) async {

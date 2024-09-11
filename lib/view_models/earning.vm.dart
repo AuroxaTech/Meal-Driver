@@ -58,7 +58,7 @@ class EarningViewModel extends MyBaseViewModel {
           .filter((e) => e.isActive)
           .toList();
     } catch (error) {
-      print("paymentAccounts error ==> $error");
+      print("requestEarningPayout error ==> $error");
     }
     setBusyForObject(paymentAccounts, false);
   }
