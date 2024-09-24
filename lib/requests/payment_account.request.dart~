@@ -48,7 +48,7 @@ class PaymentAccountRequest extends HttpService {
   Future<ApiResponse> requestPayout(Map<String, dynamic> payload) async {
     final apiResult = await post(Api.payoutRequest, payload);
     print("Request Payout ====> ${apiResult.data}");
-    print("Payload ====> $payload");
+    print("Payload ====> ${payload}");
     return ApiResponse.fromResponse(apiResult);
   }
 

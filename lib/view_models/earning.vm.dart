@@ -76,9 +76,33 @@ class EarningViewModel extends MyBaseViewModel {
   }
 
   processPayoutRequest() async {
+    // Check if the amount and selectedPaymentAccount are set
+    if (amountTEC.text.isEmpty || selectedPaymentAccount == null) {
+      // Show an error message if either the amount or account is missing
+      CoolAlert.show(
+        context: viewContext,
+        type: CoolAlertType.error,
+        title: "Request Payout".tr(),
+        text: "Please enter the amount and select a payment account.".tr(),
+      );
+      return;
+    }
+
     setBusy(true);
-    final apiResponse = await paymentAccountRequest.requestPayout({});
+
+    // the payload to send to the API
+    final payload = {
+      "amount": amountTEC.text, // Get the entered amount
+      "payment_account_id": selectedPaymentAccount?.id, // Get the selected account's ID
+    };
+    print("Payload ==> $payload");
+
+    // Call the API with the prepared payload
+    final apiResponse = await paymentAccountRequest.requestPayout(payload);
+
     setBusy(false);
+
+    // Show success or error message based on API response
     CoolAlert.show(
       context: viewContext,
       type: apiResponse.allGood ? CoolAlertType.success : CoolAlertType.error,
@@ -86,13 +110,15 @@ class EarningViewModel extends MyBaseViewModel {
       text: apiResponse.allGood ? "Successful".tr() : "${apiResponse.message}",
       onConfirmBtnTap: apiResponse.allGood
           ? () {
-              Navigator.pop(viewContext);
-            }
+        Navigator.pop(viewContext);
+      }
           : null,
     ).then((value) {
       fetchEarning();
     });
-    //
+
+
+//
     /*if (selectedPaymentAccount == null) {
       toastError("Please select payment account".tr());
       //

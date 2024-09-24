@@ -30,8 +30,8 @@ class PaymentAccount {
   String formattedUpdatedDate;
 
   factory PaymentAccount.fromJson(Map<String, dynamic> json) => PaymentAccount(
-    name: json["name"] ?? '', // Default to empty string if null
-    number: json["number"] ?? '', // Default to empty string if null
+    name: json["bank_name"] ?? '', // Default to empty string if null
+    number: json["account_number"] ?? '', // Default to empty string if null
     instructions: json["instructions"] ?? '', // Default to empty string if null
     isActive: (json["is_active"]?.toString().toInt() ?? 0) == 1, // Handle null safely
     updatedAt: json["updated_at"] != null

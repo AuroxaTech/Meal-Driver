@@ -312,6 +312,31 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
     isPickedUp = false;
     getOrder();
   }
+  cancelTrip(int index) async {
+    setBusy(true);
+
+    // Assuming you are fetching the orderId similar to the original code
+    int orderId = orderList[index].orderProducts?.first.orderId ?? 0;
+
+    // Making the API call to cancel the order using the provided API format
+    final apiResult = await taxiRequest.cancelTrip(orderId);  // Call the cancelTrip method here
+
+    if (apiResult.code==200 ) {
+      // Handle the success response accordingly
+      isAccepted = false;
+      isEnteredTheStore = false;
+      isPickedUp = false;
+
+      // Refresh the order list or perform any further actions after canceling
+      getOrder();
+    } else {
+      // Handle the failure response if needed
+      print("Failed to cancel the order: ${apiResult.message}");
+    }
+
+    setBusy(false);
+  }
+
 
   cancelOrderDelivery(int index) async {
     setBusy(true);
@@ -323,6 +348,7 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
     isPickedUp = false;
     getOrder();
   }
+
 
 //fetch driver online offline
   getOnlineDriverState() async {

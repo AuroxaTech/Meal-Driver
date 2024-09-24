@@ -36,7 +36,7 @@ class EarningBottomSheet extends StatelessWidget {
                           //currency
                           "${vm.currency?.symbol}".text.medium.xl.make().px4(),
                           //earning
-                          "${vm.earning?.amount}"
+                          "${vm.earning?.available}"
                               .currencyValueFormat()
                               .text
                               .semiBold
@@ -90,7 +90,8 @@ class EarningBottomSheet extends StatelessWidget {
                                     DropdownButtonFormField<PaymentAccount>(
                                       decoration:
                                           const InputDecoration.collapsed(
-                                              hintText: ""),
+                                              hintText: "Select Payment Account",
+                                          ),
                                       value: vm.selectedPaymentAccount,
                                       onChanged: (value) {
                                         vm.selectedPaymentAccount = value;
@@ -101,7 +102,7 @@ class EarningBottomSheet extends StatelessWidget {
                                           return DropdownMenuItem(
                                               value: e,
                                               child:
-                                                  Text("${e.name}(${e.number})")
+                                                  Text("${e.name} (${e.number})")
                                               // .text
                                               // .make(),
                                               );
@@ -127,7 +128,7 @@ class EarningBottomSheet extends StatelessWidget {
                                           FormValidator.validateCustom(
                                         value,
                                         rules:
-                                            "required||numeric||lte:${vm.earning?.amount}",
+                                            "required||numeric||lte:${vm.earning?.available}",
                                       ),
                                     ).py12(),
                                     CustomButton(

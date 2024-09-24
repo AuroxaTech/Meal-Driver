@@ -187,6 +187,26 @@ class OrderRequest extends HttpService {
       throw "${apiResponse.message}";
     }
   }
+  Future<void> cancelOrder(int id) async {
+    final apiResult = await post(
+      Api.cancelTaxiOrderAssignment, // Replace with your actual API endpoint
+      {
+        "order_id": id,  // Send order_id as per the API documentation
+      },
+    );
+
+    print({
+      "order_id": id,
+    });
+
+    final apiResponse = ApiResponse.fromResponse(apiResult);
+    if (apiResponse.allGood) {
+      print("Order cancellation successful: ${apiResponse.body['message']}");
+    } else {
+      throw "API Response Error =====> ${apiResponse.message}";
+    }
+  }
+
 
   //"delivered"  "enroute"
   Future<Order> updateOrderStatus(int id,

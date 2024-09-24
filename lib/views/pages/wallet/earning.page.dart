@@ -41,7 +41,7 @@ class EarningPage extends StatelessWidget {
                 child: VStack(
                   [
                     //amount
-                    "Your Earning ${vm.currency?.symbol} ${vm.earning?.amount.toStringAsFixed(2)}"
+                    "Your Earning ${vm.currency?.symbol} ${vm.earning?.available.toStringAsFixed(2)}"
                         .currencyValueFormat()
                         .text
                         .bold
@@ -71,7 +71,7 @@ class EarningPage extends StatelessWidget {
                       alignment: Alignment.topRight,
                       child: CustomButton(
                         title:
-                            "Cashout Now\n\$${vm.earning?.amount.toStringAsFixed(2)}",
+                            "Cashout Now\n\$${vm.earning?.available.toStringAsFixed(2)}",
                         titleStyle: const TextStyle(
                             fontSize: 23,
                             fontWeight: FontWeight.w600,
@@ -82,7 +82,6 @@ class EarningPage extends StatelessWidget {
                             vm.showEarning, //vm.processPayoutRequest,
                       ).centered().py12().w(300),
                     ),
-
                     // "${vm.earning?.formattedUpdatedDate}".text.medium.lg.makeCentered(),
 
                     //request payout
@@ -95,79 +94,79 @@ class EarningPage extends StatelessWidget {
                     // ),
 
                     //payout form
-                    Visibility(
-                      visible: vm.showPayout,
-                      child: Form(
-                        key: vm.formKey,
-                        child: vm.busy(vm.paymentAccounts)
-                            ? const BusyIndicator().centered().py20()
-                            : VStack(
-                                [
-                                  //
-                                  const Divider(thickness: 2).py12(),
-                                  "Request Payout".tr().text.semiBold.xl.make(),
-                                  UiSpacer.verticalSpace(),
-                                  //
-                                  "Payment Account".tr().text.base.light.make(),
-                                  DropdownButtonFormField<PaymentAccount>(
-                                    decoration: const InputDecoration.collapsed(
-                                        hintText: ""),
-                                    value: vm.selectedPaymentAccount,
-                                    onChanged: (value) {
-                                      vm.selectedPaymentAccount = value;
-                                      vm.notifyListeners();
-                                    },
-                                    items: vm.paymentAccounts.map(
-                                      (e) {
-                                        return DropdownMenuItem(
-                                            value: e,
-                                            child:
-                                                Text("${e.name}(${e.number})")
-                                            // .text
-                                            // .make(),
-                                            );
-                                      },
-                                    ).toList(),
-                                  )
-                                      .p12()
-                                      .box
-                                      .border(color: AppColor.accentColor)
-                                      .roundedSM
-                                      .make()
-                                      .py4(),
-                                  //
-                                  UiSpacer.verticalSpace(space: 10),
-                                  CustomTextFormField(
-                                    labelText: "Amount".tr(),
-                                    textEditingController: vm.amountTEC,
-                                    keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                      decimal: true,
-                                    ),
-                                    validator: (value) =>
-                                        FormValidator.validateCustom(
-                                      value,
-                                      rules:
-                                          "required||numeric||lte:${vm.earning?.amount}",
-                                    ),
-                                  ).py12(),
-                                  CustomButton(
-                                    title: "Request Payout".tr(),
-                                    loading: vm.busy(vm.selectedPaymentAccount),
-                                    onPressed: vm.processPayoutRequest,
-                                  ).centered().py12(),
-                                  //
-                                  CustomTextButton(
-                                    title: "Close".tr(),
-                                    onPressed: () {
-                                      vm.showPayout = false;
-                                      vm.notifyListeners();
-                                    },
-                                  ).centered(),
-                                ],
-                              ).scrollVertical(),
-                      ),
-                    ),
+                    // Visibility(
+                    //   visible: vm.showPayout,
+                    //   child: Form(
+                    //     key: vm.formKey,
+                    //     child: vm.busy(vm.paymentAccounts)
+                    //         ? const BusyIndicator().centered().py20()
+                    //         : VStack(
+                    //             [
+                    //               //
+                    //               const Divider(thickness: 2).py12(),
+                    //               "Request Payout".tr().text.semiBold.xl.make(),
+                    //               UiSpacer.verticalSpace(),
+                    //               //
+                    //               "Payment Account".tr().text.base.light.make(),
+                    //               DropdownButtonFormField<PaymentAccount>(
+                    //                 decoration: const InputDecoration.collapsed(
+                    //                     hintText: ""),
+                    //                 value: vm.selectedPaymentAccount,
+                    //                 onChanged: (value) {
+                    //                   vm.selectedPaymentAccount = value;
+                    //                   vm.notifyListeners();
+                    //                 },
+                    //                 items: vm.paymentAccounts.map(
+                    //                   (e) {
+                    //                     return DropdownMenuItem(
+                    //                         value: e,
+                    //                         child:
+                    //                             Text("${e.name}(${e.number})")
+                    //                         // .text
+                    //                         // .make(),
+                    //                         );
+                    //                   },
+                    //                 ).toList(),
+                    //               )
+                    //                   .p12()
+                    //                   .box
+                    //                   .border(color: AppColor.accentColor)
+                    //                   .roundedSM
+                    //                   .make()
+                    //                   .py4(),
+                    //               //
+                    //               UiSpacer.verticalSpace(space: 10),
+                    //               CustomTextFormField(
+                    //                 labelText: "Amount".tr(),
+                    //                 textEditingController: vm.amountTEC,
+                    //                 keyboardType:
+                    //                     const TextInputType.numberWithOptions(
+                    //                   decimal: true,
+                    //                 ),
+                    //                 validator: (value) =>
+                    //                     FormValidator.validateCustom(
+                    //                   value,
+                    //                   rules:
+                    //                       "required||numeric||lte:${vm.earning?.amount}",
+                    //                 ),
+                    //               ).py12(),
+                    //               CustomButton(
+                    //                 title: "Request Payout".tr(),
+                    //                 loading: vm.busy(vm.selectedPaymentAccount),
+                    //                 onPressed: vm.processPayoutRequest,
+                    //               ).centered().py12(),
+                    //               //
+                    //               CustomTextButton(
+                    //                 title: "Close".tr(),
+                    //                 onPressed: () {
+                    //                   vm.showPayout = false;
+                    //                   vm.notifyListeners();
+                    //                 },
+                    //               ).centered(),
+                    //             ],
+                    //           ).scrollVertical(),
+                    //   ),
+                    // ),
                   ],
                   crossAlignment: CrossAxisAlignment.start,
                   alignment: MainAxisAlignment.start,

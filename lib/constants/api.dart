@@ -55,6 +55,7 @@ class Api {
   static const updateTaxiBookingAssignmentStatus =
       "/taxi/order/asignment/update_status";
   static const rating = "/rating";
+  static const cancelTaxiOrderAssignment = "/taxi/order/asignment/reject";
   static const vehicleTypes = "/partner/vehicle/types";
   static const carMakes = "/partner/car/makes";
   static const carModels = "/partner/car/models";

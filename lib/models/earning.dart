@@ -30,11 +30,11 @@ class Earning {
   double available;
 
   factory Earning.fromJson(Map<String, dynamic> json) {
-    print("JSON Data: $json"); // This will print the entire JSON object
+    print("Earning Data ====>  ${json.toString()}"); // This will print the entire JSON object
     double parsedAmount = json["amount"] != null
         ? (json["amount"] is int ? json["amount"].toDouble() : json["amount"])
         : 0.0;
-    print("Parsed Amount: $parsedAmount"); // This will show the amount after parsing
+    print("Parsed Amount ====>  $parsedAmount"); // This will show the amount after parsing
 
     return Earning(
         id: json["id"],

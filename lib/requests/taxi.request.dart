@@ -56,7 +56,7 @@ class TaxiRequest extends HttpService {
   Future<ApiResponse> rejectAssignment(int orderId, int driverId) async {
     //
     final apiResult = await post(
-      "${Api.rejectTaxiBookingAssignment}",
+      Api.rejectTaxiBookingAssignment,
       {
         //
         //"driver_id": driverId,

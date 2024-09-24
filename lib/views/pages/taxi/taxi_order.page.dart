@@ -278,6 +278,8 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
                               ),
                               itemBuilder: (BuildContext context, int index,
                                   int realIndex) {
+                                print("Deleviry Fee: ${vm.orderList[index].vendor?.deliveryFee}");
+
                                 if (vm.isAccepted && index > 0) {
                                   //Additional delivery destination info
                                   index = index - 1;
@@ -315,7 +317,7 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
                                                   .make(),
                                             ).onTap(() {
                                               if (vm.isAccepted) {
-                                                vm.cancelOrderDelivery(index);
+                                                vm.cancelTrip(index);
                                               } else {
                                                 vm.rejectAssignment(index);
                                               }
@@ -586,7 +588,7 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
                                                 .make(),
                                           ).onTap(() {
                                             if (vm.isAccepted) {
-                                              vm.cancelOrderDelivery(index);
+                                              vm.cancelTrip(index);
                                             } else {
                                               vm.rejectAssignment(index);
                                             }
