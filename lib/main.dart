@@ -16,7 +16,7 @@ import 'firebase_options.dart';
 import 'services/notification.service.dart';
 import 'views/overlays/floating_app_bubble.view.dart';
 
-//New Changes
+//Updated Code
 //ssll handshake error
 class MyHttpOverrides extends HttpOverrides {
   @override
