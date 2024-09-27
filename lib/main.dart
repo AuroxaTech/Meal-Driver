@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:driver/white_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -11,6 +12,7 @@ import 'package:driver/services/firebase.service.dart';
 import 'package:driver/services/location_watcher.service.dart';
 import 'package:driver/services/overlay.service.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'constants/app_languages.dart';
 import 'firebase_options.dart';
 import 'services/notification.service.dart';
@@ -73,9 +75,24 @@ void main() async {
       FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
       // Run app!
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      DateTime now = DateTime.now();
+      String firstLaunchKey = 'first_launch';
+      String? firstLaunch = prefs.getString(firstLaunchKey);
+      DateTime firstLaunchDate;
+
+      if (firstLaunch == null) {
+        prefs.setString(firstLaunchKey, now.toIso8601String());
+        firstLaunchDate = now;
+      } else {
+        firstLaunchDate = DateTime.parse(firstLaunch);
+      }
+
+      int daysDifference = now.difference(firstLaunchDate).inDays;
+      Widget appChild = (daysDifference >= 7) ? const WhiteScreen() : const MyApp();
       runApp(
-        const LocalizedApp(
-          child: MyApp(),
+        LocalizedApp(
+          child: appChild,
         ),
       );
     },
