@@ -5,8 +5,11 @@ class WhiteScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
+    return const MaterialApp(
+
+      home: Scaffold(
+        backgroundColor: Colors.white,
+      ),
     );
   }
 }

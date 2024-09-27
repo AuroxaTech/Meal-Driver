@@ -278,7 +278,6 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
                               ),
                               itemBuilder: (BuildContext context, int index,
                                   int realIndex) {
-                                print("Deleviry Fee: ${vm.orderList[index].vendor?.deliveryFee}");
 
                                 if (vm.isAccepted && index > 0) {
                                   //Additional delivery destination info
@@ -480,12 +479,20 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
                                                                   .acceptedOrder
                                                                   ?.deliveryAddress
                                                                   ?.address);
+                                                          print("Customer Address = ${vm
+                                                              .acceptedOrder
+                                                              ?.deliveryAddress
+                                                              ?.address}");
                                                         } else {
                                                           MapUtils.launchDirections(
                                                               address: vm
                                                                   .acceptedOrder
                                                                   ?.vendor
                                                                   ?.address);
+                                                          print("Vendor Address = ${vm
+                                                              .acceptedOrder
+                                                              ?.vendor
+                                                              ?.address}");
                                                         }
                                                         /*double lat = vm
                                                                 .acceptedOrder

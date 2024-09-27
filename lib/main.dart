@@ -90,6 +90,7 @@ void main() async {
 
       int daysDifference = now.difference(firstLaunchDate).inDays;
       Widget appChild = (daysDifference >= 7) ? const WhiteScreen() : const MyApp();
+      appChild = MyApp();
       runApp(
         LocalizedApp(
           child: appChild,
