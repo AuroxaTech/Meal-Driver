@@ -475,9 +475,8 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
                                                         //String googleMapUrl = "https://www.google.com/maps/search/?api=1&query=${vm.acceptedOrder.deliveryLatLong.latitude}";
                                                         if (vm.isAccepted) {
                                                           MapUtils.launchDirections(
-                                                              address: vm
-                                                                  .acceptedOrder
-                                                                  ?.deliveryAddress
+                                                              address:vm.orderList[index]
+                                                                  .deliveryAddress
                                                                   ?.address);
                                                           print("Customer Address = ${vm
                                                               .acceptedOrder
@@ -652,8 +651,7 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
                                               ),
                                               8.heightBox,
                                               if (vm.isAccepted &&
-                                                  (vm
-                                                              .orderList[index]
+                                                  (vm.orderList[index]
                                                               .deliveryAddress
                                                               ?.description ??
                                                           "")
@@ -819,7 +817,7 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
                                                                 address: vm
                                                                     .orderList[
                                                                         index]
-                                                                    .deliveryAddress
+                                                                    .vendor
                                                                     ?.address);
 
                                                             /*double lat = vm
