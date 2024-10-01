@@ -9,6 +9,8 @@ import 'package:driver/widgets/custom_grid_view.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
+import '../../constants/app_routes.dart';
+
 class AppLanguageSelector extends StatelessWidget {
   const AppLanguageSelector({super.key});
 
@@ -87,5 +89,7 @@ class AppLanguageSelector extends StatelessWidget {
     await LocalizeAndTranslate.setLanguageCode(code);
     //
     Navigator.pop(context);
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil(AppRoutes.loginRoute, (route) => false);
   }
 }

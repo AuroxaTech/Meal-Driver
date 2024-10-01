@@ -198,7 +198,7 @@ class PermissionViewModel extends MyBaseViewModel {
       final androidConfig = FlutterBackgroundAndroidConfig(
         notificationTitle: "Background service".tr(),
         notificationText: "Background notification to keep app running".tr(),
-        notificationImportance: AndroidNotificationImportance.Default,
+        notificationImportance: AndroidNotificationImportance.normal,
         notificationIcon: AndroidResource(
           name: 'notification_icon',
           defType: 'drawable',

@@ -49,9 +49,11 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
   TaxiViewModel(BuildContext context) {
     viewContext = context;
   }
-
+  Timer? pollingTimer;
   OrderRequest orderRequest = OrderRequest();
   TaxiRequest taxiRequest = TaxiRequest();
+  bool isInitialLoading = true;
+  bool isButtonLoading = false;
 
   //services
   TaxiLocationService? taxiLocationService;
@@ -93,6 +95,20 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
 
   slider.CarouselController carouselSliderController = slider.CarouselController();
 
+  void startPollingForOrders() {
+    if (pollingTimer == null || !pollingTimer!.isActive) {
+      pollingTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+        await getOrder(); // Replace with your API call to fetch orders
+      });
+    }
+  }
+
+  // Stop the polling
+  void stopPollingForOrders() {
+    pollingTimer?.cancel();
+    pollingTimer = null;
+  }
+
   @override
   void initialise() async {
     super.initialise();
@@ -103,7 +119,9 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
     newTaxiBookingService = NewTaxiBookingService(this);
     onGoingTaxiBookingService = OnGoingTaxiBookingService(this);
     taxiLocationService = TaxiLocationService(this);
-    getOrder();
+    isInitialLoading = true; // Set initial loading to true
+    await getOrder(); // Initial order fetch
+    isInitialLoading = false;
     //get the driver online status from the server api
     await getOnlineDriverState();
 
@@ -123,17 +141,21 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
     currentUser = await AuthServices.getCurrentUser();
     driverVehicle = await AuthServices.getDriverVehicle();
     //
+
     AppService().driverIsOnline =
         LocalStorageService.prefs!.getBool(AppStrings.onlineOnApp) ?? false;
     notifyListeners();
 
+    if (AppService().driverIsOnline) {
+      startPollingForOrders();
+    }
     //
     await OrderManagerService().monitorOnlineStatusListener();
     notifyListeners();
 
     //
     locationReadyStream = LocationService().locationDataAvailable.stream.listen(
-      (event) {
+          (event) {
         if (event) {
           print("abut call ==> listenToNewOrders");
           listenToNewOrders();
@@ -142,7 +164,7 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
     );
 
     homePageChangeStream = AppService().homePageIndex.stream.listen(
-      (index) {
+          (index) {
         //
         onTabChange(index);
       },
@@ -178,12 +200,15 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
     controllerDotCount?.stop();
   }
 
+  // Main function to fetch orders and handle polling
   getOrder() async {
+    if (!isInitialLoading) {
+      setBusy(false); // Avoid showing busy indicator during polling
+    }
     //load today earning as well
     fetchEarning();
 
     List<Order> tempOrders = await orderRequest.lookingOrders(queryParameters: {
-      //'status':['pending','preparing','ready','enroute','failed'],
       'status[0]': 'preparing',
       'status[1]': 'pending',
       'status[2]': 'enter_store',
@@ -194,7 +219,7 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
     print("Temp Orders $tempOrders");
     int userId = await AuthServices.getUserId();
     Order? existingOrder = tempOrders.firstOrNullWhere(
-        (element) => (null != element.driverId && element.driverId == userId));
+            (element) => (null != element.driverId && element.driverId == userId));
     if (null != existingOrder) {
       isAccepted = true;
       /// Available statuses
@@ -216,43 +241,54 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
     } else {
       orderList = tempOrders;
     }
+
+    // Stop polling if orders are found
     if (orderList.isNotEmpty) {
+      stopPollingForOrders(); // Stop polling when orders are available
       notifyListeners();
-      try {
-        taxiGoogleMapManagerService?.getCurrentLocation();
-        taxiGoogleMapManagerService?.currentIndex = 0;
-        taxiGoogleMapManagerService?.drawRoute(0);
-        notifyListeners();
-
-        Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high,
-        );
-
-        LatLng source = LatLng(position.latitude, position.longitude);
-
-        for (Order order in orderList) {
-          Vendor? vendor = order.vendor;
-          if (null != vendor) {
-            double latitude = (vendor.latitude).toDouble();
-            double longitude = (vendor.longitude).toDouble();
-            LatLng destination = LatLng(latitude, longitude);
-
-            Utils.vendorDistanceFromDefaultAddress(source, destination)
-                .then((value) {
-              if (value.length > 1) {
-                order.pickupDistance.value = value[0];
-                order.pickupTravelTime.value = value[1].toInt();
-              }
-            });
-          }
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          print(e);
-        }
+    } else {
+      // If orderList is empty, restart polling
+      if (pollingTimer == null || !pollingTimer!.isActive) {
+        startPollingForOrders();
       }
     }
+
+    try {
+      taxiGoogleMapManagerService?.getCurrentLocation();
+      taxiGoogleMapManagerService?.currentIndex = 0;
+      taxiGoogleMapManagerService?.drawRoute(0);
+      notifyListeners();
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      LatLng source = LatLng(position.latitude, position.longitude);
+
+      for (Order order in orderList) {
+        Vendor? vendor = order.vendor;
+        if (null != vendor) {
+          double latitude = (vendor.latitude).toDouble();
+          double longitude = (vendor.longitude).toDouble();
+          LatLng destination = LatLng(latitude, longitude);
+
+          Utils.vendorDistanceFromDefaultAddress(source, destination)
+              .then((value) {
+            if (value.length > 1) {
+              order.pickupDistance.value = value[0];
+              order.pickupTravelTime.value = value[1].toInt();
+            }
+          });
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+
     setBusy(false);
+
     //Move the slider to delivery address if the order is picked up
     if (isPickedUp) {
       Future.delayed(const Duration(seconds: 1), () {
@@ -275,66 +311,96 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
   /// delivered
   /// failed
   /// cancelled
-
+  void setButtonLoading(bool loading) {
+    isButtonLoading = loading;
+    notifyListeners();
+  }
+  // Accept Order Logic
   acceptOrder(int index) async {
-    setBusy(true);
-    acceptedOrder = await orderRequest
-        .acceptNewOrder(orderList[index].orderProducts?.first.orderId ?? 0);
-    isAccepted = true;
-    getOrder();
+    setButtonLoading(true); // Start button-specific loading
+    try {
+      setBusy(true); // General busy state
+      acceptedOrder = await orderRequest
+          .acceptNewOrder(orderList[index].orderProducts?.first.orderId ?? 0);
+      isAccepted = true;
+      getOrder();
+    } finally {
+      setBusy(false);
+      setButtonLoading(false); // Stop button-specific loading
+    }
   }
 
+  // Enter the Store Logic
   enteredTheStoreForOrder(int index) async {
-    setBusy(true);
-    acceptedOrder = await orderRequest.updateOrderStatus(
-        orderList[index].orderProducts?.first.orderId ?? 0,
-        status: "enter_store");
-    isEnteredTheStore = true;
-    getOrder();
+    setButtonLoading(true); // Start button-specific loading
+    try {
+      setBusy(true); // General busy state
+      acceptedOrder = await orderRequest.updateOrderStatus(
+          orderList[index].orderProducts?.first.orderId ?? 0,
+          status: "enter_store");
+      isEnteredTheStore = true;
+      getOrder();
+    } finally {
+      setBusy(false);
+      setButtonLoading(false); // Stop button-specific loading
+    }
   }
 
+  // Order Pickup Done Logic
   orderPickupDone(int index) async {
-    setBusy(true);
-    acceptedOrder = await orderRequest.updateOrderStatus(
-        orderList[index].orderProducts?.first.orderId ?? 0,
-        status: "picked_up");
-    isPickedUp = true;
-    getOrder();
+    setButtonLoading(true); // Start button-specific loading
+    try {
+      setBusy(true); // General busy state
+      acceptedOrder = await orderRequest.updateOrderStatus(
+          orderList[index].orderProducts?.first.orderId ?? 0,
+          status: "picked_up");
+      isPickedUp = true;
+      getOrder();
+    } finally {
+      setBusy(false);
+      setButtonLoading(false); // Stop button-specific loading
+    }
   }
 
+  // Successful Order Delivery Logic
   successfulOrderDelivery(int index) async {
-    setBusy(true);
-    acceptedOrder = await orderRequest.updateOrderStatus(
-        orderList[index].orderProducts?.first.orderId ?? 0,
-        status: "delivered");
-    isAccepted = false;
-    isEnteredTheStore = false;
-    isPickedUp = false;
-    getOrder();
-  }
-  cancelTrip(int index) async {
-    setBusy(true);
-
-    // Assuming you are fetching the orderId similar to the original code
-    int orderId = orderList[index].orderProducts?.first.orderId ?? 0;
-
-    // Making the API call to cancel the order using the provided API format
-    final apiResult = await taxiRequest.cancelTrip(orderId);  // Call the cancelTrip method here
-
-    if (apiResult.code==200 ) {
-      // Handle the success response accordingly
+    setButtonLoading(true); // Start button-specific loading
+    try {
+      setBusy(true); // General busy state
+      acceptedOrder = await orderRequest.updateOrderStatus(
+          orderList[index].orderProducts?.first.orderId ?? 0,
+          status: "delivered");
       isAccepted = false;
       isEnteredTheStore = false;
       isPickedUp = false;
-
-      // Refresh the order list or perform any further actions after canceling
       getOrder();
-    } else {
-      // Handle the failure response if needed
-      print("Failed to cancel the order: ${apiResult.message}");
+    } finally {
+      setBusy(false);
+      setButtonLoading(false); // Stop button-specific loading
     }
+  }
 
-    setBusy(false);
+  // Cancel Trip Logic
+  cancelTrip(int index) async {
+    setButtonLoading(true); // Start button-specific loading
+    try {
+      setBusy(true); // General busy state
+
+      int orderId = orderList[index].orderProducts?.first.orderId ?? 0;
+      final apiResult = await taxiRequest.cancelTrip(orderId);
+
+      if (apiResult.code == 200) {
+        isAccepted = false;
+        isEnteredTheStore = false;
+        isPickedUp = false;
+        getOrder(); // Refresh the order list after canceling
+      } else {
+        print("Failed to cancel the order: ${apiResult.message}");
+      }
+    } finally {
+      setBusy(false);
+      setButtonLoading(false); // Stop button-specific loading
+    }
   }
 
 
@@ -562,12 +628,16 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
     cancelAllListeners();
   }
 
-  void rejectAssignment(int index) {
-    taxiRequest.rejectAssignment(orderList[index].id, 0).then((value) {
-      getOrder();
-    });
-  }
-}
+  // Reject Assignment Logic
+  void rejectAssignment(int index) async {
+    setButtonLoading(true); // Start button-specific loading
+    try {
+      await taxiRequest.rejectAssignment(orderList[index].id, 0);
+      getOrder(); // Refresh orders
+    } finally {
+      setButtonLoading(false); // Stop button-specific loading
+    }
+  }}
 
 class DotAnimation extends StatelessWidget {
   @override

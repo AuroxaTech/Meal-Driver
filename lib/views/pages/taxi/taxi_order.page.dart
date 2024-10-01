@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:driver/utils/map.utils.dart';
 import 'package:driver/views/pages/order/completed_orders.page.dart';
+import 'package:driver/views/pages/taxi/widgets/statuses/idle.view.dart';
 import 'package:flutter/material.dart';
 import 'package:driver/constants/app_colors.dart';
 import 'package:driver/services/location.service.dart';
@@ -135,7 +136,6 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
               //     return snapshot.data!;
               //   },
               // ),
-              //permission request
               CustomVisibility(
                 visible: !(vm.taxiGoogleMapManagerService?.canShowMap ?? false),
                 child: LocationPermissionView(
@@ -150,7 +150,7 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
 
               //loading
               Visibility(
-                visible: vm.isBusy,
+                visible:  vm.isButtonLoading || (vm.isInitialLoading && vm.isBusy),
                 child: BusyIndicator(
                   color: AppColor.primaryColor,
                 )
@@ -923,7 +923,7 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
                         border:
                             Border.all(color: AppColor.primaryColor, width: 2),
                         borderRadius: BorderRadius.circular(15)),
-                    child: !taxiViewModel!.isBusy
+                    child: !(vm.isBusy && vm.isInitialLoading)
                         ? (!AppService().driverIsOnline
                                 ? "Offline".tr()
                                 : null != vm.earning

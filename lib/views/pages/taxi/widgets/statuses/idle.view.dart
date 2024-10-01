@@ -12,8 +12,11 @@ class IdleTaxiView extends StatelessWidget {
   const IdleTaxiView(this.taxiViewModel, {super.key});
 
   final TaxiViewModel taxiViewModel;
+
   @override
   Widget build(BuildContext context) {
+    final driverVehicle = AuthServices.driverVehicle;
+
     return Positioned(
       bottom: 0,
       left: 0,
@@ -25,7 +28,6 @@ class IdleTaxiView extends StatelessWidget {
         },
         child: VStack(
           [
-            //
             Visibility(
               visible: taxiViewModel.appService.driverIsOnline,
               child: VStack(
@@ -44,41 +46,49 @@ class IdleTaxiView extends StatelessWidget {
               ),
             ),
 
-            //Online/offline
+            //Online/offline button
             OnlineStatusSwipeButton(taxiViewModel),
-            //
-            VStack(
-              [
-                "Vehicle Type".tr().text.light.make(),
-                HStack(
-                  [
-                    CustomImage(
-                            imageUrl:
-                                AuthServices.driverVehicle!.vehicleType.photo)
-                        .wh(32, 32),
-                    UiSpacer.hSpace(5),
-                    AuthServices.driverVehicle!.vehicleType.name
-                        .text
-                        .xl
-                        .semiBold
-                        .make()
-                        .expand(),
-                  ],
-                ),
-                UiSpacer.vSpace(),
-                "Vehicle Details".tr().text.thin.make(),
-                HStack(
-                  [
-                    "${AuthServices.driverVehicle?.carModel.carMake?.name} (${AuthServices.driverVehicle?.carModel.name}) - ${AuthServices.driverVehicle?.regNo} - ${AuthServices.driverVehicle?.color.toUpperCase()}"
-                        .text
-                        .xl
-                        .semiBold
-                        .make()
-                        .expand(),
-                  ],
-                ),
-              ],
-            ).p20(),
+
+            // Driver's vehicle info, only if it's available
+            if (driverVehicle != null) ...[
+              VStack(
+                [
+                  "Vehicle Type".tr().text.light.make(),
+                  HStack(
+                    [
+                      CustomImage(
+                          imageUrl: driverVehicle.vehicleType.photo ?? '')
+                          .wh(32, 32),
+                      UiSpacer.hSpace(5),
+                      driverVehicle.vehicleType.name
+                          .text
+                          .xl
+                          .semiBold
+                          .make()
+                          .expand(),
+                    ],
+                  ),
+                  UiSpacer.vSpace(),
+                  "Vehicle Details".tr().text.thin.make(),
+                  HStack(
+                    [
+                      "${driverVehicle.carModel?.carMake?.name ?? 'Unknown'} (${driverVehicle.carModel?.name ?? 'Unknown'}) - ${driverVehicle.regNo ?? 'Unknown'} - ${driverVehicle.color?.toUpperCase() ?? 'Unknown'}"
+                          .text
+                          .xl
+                          .semiBold
+                          .make()
+                          .expand(),
+                    ],
+                  ),
+                ],
+              ).p20(),
+            ] else
+            // Display a message when the driver vehicle info is not available
+              "Vehicle information is not available"
+                  .tr()
+                  .text
+                  .light
+                  .makeCentered(),
           ],
         )
             .box
