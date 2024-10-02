@@ -171,11 +171,11 @@ class OrderRequest extends HttpService {
   }
 
   //
-  Future<Order> acceptNewOrder(int id, {String status = "preparing"}) async {
+  Future<Order> acceptNewOrder(int id, {String status = "ready"}) async {
     final apiResult = await post(
       Api.acceptTaxiBookingAssignment,
       {
-        // "status": status,
+        "status": status,
         // "driver_id": (await AuthServices.getCurrentUser()).id,
         "order_id": id,
       },
