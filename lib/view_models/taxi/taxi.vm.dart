@@ -101,6 +101,8 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
     if (pollingTimer == null || !pollingTimer!.isActive) {
       pollingTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
         await getOrder(); // Replace with your API call to fetch orders
+        print("Polling Start Initially");
+
       });
     }
   }
@@ -112,71 +114,63 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
   }
 
   @override
+  @override
   void initialise() async {
     super.initialise();
-    //
+
     commission = await AuthServices.getCommission();
     taxiGoogleMapManagerService = TaxiGoogleMapManagerService(this);
     await taxiGoogleMapManagerService?.setSourceAndDestinationIcons();
     newTaxiBookingService = NewTaxiBookingService(this);
     onGoingTaxiBookingService = OnGoingTaxiBookingService(this);
     taxiLocationService = TaxiLocationService(this);
-    isInitialLoading = true; // Set initial loading to true
-    await getOrder(); // Initial order fetch
+
+    // Initially, set loading to true and fetch orders
+    isInitialLoading = true;
+    await getOrder();
     isInitialLoading = false;
-    //get the driver online status from the server api
+
+    // Check the driver’s online status from the server
     await getOnlineDriverState();
 
-    // Load the status of driver free/online from firebase
-    await OrderManagerService().monitorOnlineStatusListener(
-      appService: appService,
-    );
-    //update the new taxi booking service listener
-    await newTaxiBookingService?.toggleVisibility(appService.driverIsOnline);
+    // Load the driver’s status from Firebase
+    await OrderManagerService().monitorOnlineStatusListener(appService: appService);
 
-    //now check for any on going trip
-    await checkForOnGoingTrip();
-
-    //
-    handleAppUpdate(viewContext);
-    //
-    currentUser = await AuthServices.getCurrentUser();
-    driverVehicle = await AuthServices.getDriverVehicle();
-    //
-
-    AppService().driverIsOnline =
-        LocalStorageService.prefs!.getBool(AppStrings.onlineOnApp) ?? false;
-    notifyListeners();
-
+    // If the driver is online, start polling for orders
     if (AppService().driverIsOnline) {
       startPollingForOrders();
     }
-    //
-    await OrderManagerService().monitorOnlineStatusListener();
-    notifyListeners();
 
-    //
+    // Check for any ongoing trips
+    await checkForOnGoingTrip();
+
+    // Start listening to app updates
+    handleAppUpdate(viewContext);
+
+    currentUser = await AuthServices.getCurrentUser();
+    driverVehicle = await AuthServices.getDriverVehicle();
+
+    // Start polling if the driver is already online
+    if (AppService().driverIsOnline) {
+      startPollingForOrders();
+      startAnimation();
+    }
+
+    // Listen to location data when it's ready
     locationReadyStream = LocationService().locationDataAvailable.stream.listen(
           (event) {
         if (event) {
-          print("abut call ==> listenToNewOrders");
           listenToNewOrders();
         }
       },
     );
 
+    // Handle tab changes in the app
     homePageChangeStream = AppService().homePageIndex.stream.listen(
           (index) {
-        //
         onTabChange(index);
       },
     );
-
-    //INCASE OF previous driver online state
-    handleNewOrderServices();
-    if (AppService().driverIsOnline) {
-      startAnimation();
-    }
   }
 
   fetchEarning() async {
@@ -252,6 +246,7 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
       // If orderList is empty, restart polling
       if (pollingTimer == null || !pollingTimer!.isActive) {
         startPollingForOrders();
+        print("Polling Start");
       }
     }
 
@@ -539,38 +534,40 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
   void toggleOnlineStatus() async {
     setBusy(true);
     try {
-      //
+      // Send request to update online/offline status
       final apiResponse = await authRequest.updateProfile(
         isOnline: !AppService().driverIsOnline,
       );
       if (apiResponse.allGood) {
-        //
+        // Toggle the driver's online status
         AppService().driverIsOnline = !AppService().driverIsOnline;
+
+        // Save the status locally
         await LocalStorageService.prefs!.setBool(
           AppStrings.onlineOnApp,
           AppService().driverIsOnline,
         );
 
-        //
-        // viewContext.showToast(
-        //   msg: "Updated Successfully".tr(),
-        //   bgColor: Colors.green,
-        //   textColor: Colors.white,
-        // );
-
-        //
-        handleNewOrderServices();
-
+        // If the driver is now online, start polling for orders
         if (AppService().driverIsOnline) {
+          startPollingForOrders();
           startAnimation();
+        } else {
+          // If the driver is now offline, stop polling for orders
+          stopPollingForOrders();
+          stopAnimation();
         }
+
+        notifyListeners();
       } else {
+        // Show error message if the API call fails
         viewContext.showToast(
           msg: "${apiResponse.message}",
           bgColor: Colors.red,
         );
       }
     } catch (error) {
+      // Handle error
       viewContext.showToast(msg: "$error", bgColor: Colors.red);
     }
     setBusy(false);
