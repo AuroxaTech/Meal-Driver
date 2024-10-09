@@ -176,7 +176,7 @@ class OrderRequest extends HttpService {
       Api.acceptTaxiBookingAssignment,
       {
         "status": status,
-        // "driver_id": (await AuthServices.getCurrentUser()).id,
+        "driver_id": (await AuthServices.getCurrentUser()).id,
         "order_id": id,
       },
     );

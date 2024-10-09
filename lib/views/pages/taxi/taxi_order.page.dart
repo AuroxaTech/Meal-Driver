@@ -759,7 +759,7 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
                                                                   double value,
                                                                   Widget?
                                                                       child) {
-                                                                return "${((vm.orderList[index].distance ?? 0) + value).toInt()} km"
+                                                                return "${vm.orderList[index].distance?.toInt()} km"
                                                                     .text
                                                                     .size(24)
                                                                     .bold

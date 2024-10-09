@@ -99,7 +99,7 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
 
   void startPollingForOrders() {
     if (pollingTimer == null || !pollingTimer!.isActive) {
-      pollingTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+      pollingTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
         await getOrder(); // Replace with your API call to fetch orders
         print("Polling Start Initially");
 
@@ -239,16 +239,16 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
     }
 
     // Stop polling if orders are found
-    if (orderList.isNotEmpty) {
-      stopPollingForOrders(); // Stop polling when orders are available
-      notifyListeners();
-    } else {
-      // If orderList is empty, restart polling
-      if (pollingTimer == null || !pollingTimer!.isActive) {
-        startPollingForOrders();
-        print("Polling Start");
-      }
-    }
+    // if (orderList.isNotEmpty) {
+    //   stopPollingForOrders(); // Stop polling when orders are available
+    //   notifyListeners();
+    // } else {
+    //   // If orderList is empty, restart polling
+    //   if (pollingTimer == null || !pollingTimer!.isActive) {
+    //     startPollingForOrders();
+    //     print("Polling Start");
+    //   }
+    // }
 
     try {
       taxiGoogleMapManagerService?.getCurrentLocation();
