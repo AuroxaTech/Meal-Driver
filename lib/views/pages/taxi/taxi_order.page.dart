@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:driver/utils/map.utils.dart';
 import 'package:driver/views/pages/order/completed_orders.page.dart';
-import 'package:driver/views/pages/taxi/widgets/statuses/idle.view.dart';
 import 'package:flutter/material.dart';
 import 'package:driver/constants/app_colors.dart';
 import 'package:driver/services/location.service.dart';
@@ -759,7 +758,7 @@ class _TaxiOrderPageState extends State<TaxiOrderPage>
                                                                   double value,
                                                                   Widget?
                                                                       child) {
-                                                                return "${vm.orderList[index].distance?.toInt()} km"
+                                                                return "${((vm.orderList[index].distance ?? 0) + value).toInt()} km"
                                                                     .text
                                                                     .size(24)
                                                                     .bold

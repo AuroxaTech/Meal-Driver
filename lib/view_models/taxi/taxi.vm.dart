@@ -1,8 +1,9 @@
 import 'dart:async';
-import 'package:carousel_slider/carousel_slider.dart'as slider;
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:carousel_slider/carousel_controller.dart';
+
 import 'package:dartx/dartx.dart';
 import 'package:firestore_chat/firestore_chat.dart';
-//import 'package:firestore_chat/firestore_chat.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -95,7 +96,7 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
   StreamSubscription? newOrderStream;
   AuthRequest authRequest = AuthRequest();
 
-  slider.CarouselController carouselSliderController = slider.CarouselController();
+  CarouselSliderController carouselSliderController = CarouselSliderController();
 
   void startPollingForOrders() {
     if (pollingTimer == null || !pollingTimer!.isActive) {
@@ -289,10 +290,16 @@ class TaxiViewModel extends MyBaseViewModel with UpdateService {
     //Move the slider to delivery address if the order is picked up
     if (isPickedUp) {
       Future.delayed(const Duration(seconds: 1), () {
-        carouselSliderController.nextPage(
-            duration: const Duration(milliseconds: 300), curve: Curves.linear);
+        int nextPageIndex = 1;
+        carouselSliderController.animateToPage(
+          nextPageIndex,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.linear,
+        );
       });
     }
+
+
   }
 
   checkForOnGoingTrip() async {

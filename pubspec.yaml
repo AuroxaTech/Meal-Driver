@@ -1,7 +1,7 @@
 name: driver
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.9+11
+version: 1.0.11+13
 
 environment:
   sdk: '>=3.3.4 <4.0.0'
@@ -98,7 +98,7 @@ dependencies:
   upgrader: ^10.3.0
   url_launcher: ^6.3.0
   velocity_x: ^4.2.1
-  carousel_slider: ^4.2.1
+  carousel_slider: ^5.0.0
   image_picker: ^1.1.2
 
 dependency_overrides:
