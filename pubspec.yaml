@@ -4,13 +4,13 @@ publish_to: 'none'
 version: 1.0.11+13
 
 environment:
-  sdk: '>=3.3.4 <4.0.0'
+  sdk: '>=3.3.0 <4.0.0'
 
 dependencies:
   adaptive_theme: ^3.6.0
   app_to_foreground: ^0.0.3
   args: ^2.5.0
-  assets_audio_player: ^3.1.1
+  assets_audio_player:
   awesome_drawer_bar: ^1.2.0
   awesome_notifications_core: ^0.9.3
   awesome_notifications: ^0.9.3+1
@@ -42,13 +42,13 @@ dependencies:
   firestore_chat: ^0.1.2
   dash_chat_2: ^0.0.21
   fl_location: ^3.1.0
-  location: ^7.0.0
+  location:
   flag: ^7.0.0
   flutter:
     sdk: flutter
   flutter_background: ^1.2.0
   flutter_fgbg: ^0.3.0
-  flutter_form_builder: ^9.3.0
+  flutter_form_builder:
   flutter_icons:
     git:
       url: https://github.com/imclerran/flutter-icons.git
@@ -68,8 +68,8 @@ dependencies:
   #geoflutterfire_plus: ^0.0.21
   geolocator: ^12.0.0
   georange: ^1.0.0
-  google_fonts: ^6.2.1
-  google_maps_flutter: ^2.7.0
+  google_fonts:
+  google_maps_flutter:
   hand_signature: ^3.0.3
   in_app_review: ^2.0.9
   inspection: ^0.0.13
@@ -97,9 +97,10 @@ dependencies:
   timelines: ^0.1.0
   upgrader: ^10.3.0
   url_launcher: ^6.3.0
-  velocity_x: ^4.2.1
   carousel_slider: ^5.0.0
   image_picker: ^1.1.2
+  velocity_x: 4.2.1
+  chewie: 1.8.0
 
 dependency_overrides:
   intl: ^0.18.1

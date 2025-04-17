@@ -28,7 +28,7 @@ class AppbackgroundService {
       final androidConfig = FlutterBackgroundAndroidConfig(
         notificationTitle: "Background service".tr(),
         notificationText: "Background notification to keep app running".tr(),
-        notificationImportance: AndroidNotificationImportance.normal,
+        notificationImportance: AndroidNotificationImportance.Max,
         notificationIcon: AndroidResource(
           name: 'notification_icon',
           defType: 'drawable',

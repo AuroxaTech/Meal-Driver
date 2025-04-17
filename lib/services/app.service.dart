@@ -25,12 +25,14 @@ class AppService {
   bool driverIsOnline = false;
   StreamSubscription? actionStream;
   List<int> ignoredOrders = [];
-  AssetsAudioPlayer assetsAudioPlayer = AssetsAudioPlayer();
+  AssetsAudioPlayer
+  assetsAudioPlayer = AssetsAudioPlayer();
 
   changeHomePageIndex({int index = 2}) async {
     print("Changed Home Page");
     homePageIndex.add(index);
   }
+
 
   //
   void playNotificationSound() {

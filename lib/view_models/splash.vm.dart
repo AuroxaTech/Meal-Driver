@@ -43,6 +43,7 @@ class SplashViewModel extends MyBaseViewModel {
     } catch (error) {
       setError(error);
       print("Error loading app settings ==> $error");
+      rethrow;
     }
     setBusy(false);
   }
